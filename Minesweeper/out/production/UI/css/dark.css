@@ -1,0 +1,63 @@
+* {
+    -fx-text-fill: #f0f0f0;
+    -fx-button-background: #03567e;
+    -fx-button-background-hover: #10638c;
+    -fx-button-background-pressed: #2f7596;
+    -fx-main-background: #2b2b2b;
+    -fx-selected-background: #616161;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Pane Style Tag                                                              *
+ *                                                                             *
+ ******************************************************************************/
+.theme-back {
+    -fx-background-color: -fx-main-background;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Buttons                                                                     *
+ *                                                                             *
+ ******************************************************************************/
+.button {
+    -fx-background-color: -fx-button-background;
+    -fx-background-radius: 0, 0, 0, 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+.button:hover {
+    -fx-background-color: -fx-button-background-hover;
+    -fx-background-radius: 0, 0, 0, 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+.button:pressed {
+    -fx-background-color: -fx-button-background-pressed;
+    -fx-background-radius: 0, 0, 0, 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Sweep Grid                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+.sweep-grid {
+    -fx-background-color: #156d8d;
+    -fx-background-radius: 3px;
+}
+
+.sweep-grid:hover {
+    -fx-background-color: #4396b4;
+    -fx-background-radius: 3px;
+}
+
+.selected-sweep-grid {
+    -fx-background-color: -fx-selected-background;
+    -fx-background-radius: 3px;
+}
