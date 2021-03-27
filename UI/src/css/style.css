@@ -1,0 +1,16 @@
+* {
+    -fx-diamond-color: #9c1532;
+    -fx-font-family: "Poor Richard";
+}
+
+.label {
+    -fx-font-size: 18px;
+}
+
+.button {
+    -fx-font-size: 18px;
+}
+
+.title-label {
+    -fx-font-size: 26px;
+}
