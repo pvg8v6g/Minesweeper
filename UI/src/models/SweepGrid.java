@@ -48,41 +48,7 @@ public class SweepGrid extends StackPane {
 
     // endregion
 
-    // region Statuses
-
-//    public void debug() {
-//        graphic.getStyleClass().setAll("selected-sweep-grid");
-//        image("mine");
-//    }
-//
-//    public void boom() {
-//        status = GridStatuses.GridStatus.Exploded;
-//        graphic.getStyleClass().setAll("selected-sweep-grid");
-//        image("mine");
-//    }
-//
-//    public void select(int bombs) {
-//        status = GridStatuses.GridStatus.Selected;
-//        graphic.getStyleClass().setAll("selected-sweep-grid");
-//        if (bombs > 0) label.setText(String.valueOf(bombs));
-//    }
-//
-//    public void flag() {
-//        status = GridStatuses.GridStatus.Flagged;
-//        image("flag");
-//    }
-//
-//    public void question() {
-//        status = GridStatuses.GridStatus.Questioned;
-//        label.setText("?");
-//        imageView.setImage(null);
-//    }
-//
-//    public void returnState() {
-//        status = GridStatuses.GridStatus.Normal;
-//        label.setText("");
-//        imageView.setImage(null);
-//    }
+    // region Image Loading
 
     private void image(String file) {
         imageView.setImage(new Image(location + file + ".png"));
