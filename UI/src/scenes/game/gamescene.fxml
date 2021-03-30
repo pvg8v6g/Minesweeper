@@ -15,18 +15,33 @@
       alignment="TOP_CENTER">
     <VBox alignment="TOP_CENTER"
           spacing="50.0">
-        <HBox alignment="CENTER_LEFT"
-              spacing="100.0">
+        <HBox alignment="CENTER">
+            <Label fx:id="gameOverField"
+                   style="-fx-font-size: 50px;"/>
+        </HBox>
+        <HBox alignment="CENTER"
+              spacing="50.0">
+            <Label fx:id="remainingBombsField"/>
+            <HBox spacing="5.0">
+                <Label text="Time:"/>
+                <Label fx:id="timerField"
+                       minWidth="50.0"
+                       maxWidth="50.0"/>
+            </HBox>
+        </HBox>
+        <GridBox fx:id="gridPane"
+                 alignment="CENTER"/>
+        <HBox alignment="CENTER"
+              spacing="10.0">
             <Button text="Exit"
                     prefWidth="150.0"
                     prefHeight="35.0"
                     onAction="#exitAction"/>
-            <Label fx:id="gameOverField"
-                   style="-fx-font-size: 50px;"/>
+            <Button text="Reset"
+                    prefWidth="150.0"
+                    prefHeight="35.0"
+                    onAction="#resetAction"/>
         </HBox>
-        <Label fx:id="remainingBombsField"/>
-        <GridBox fx:id="gridPane"
-                 alignment="CENTER"/>
     </VBox>
     <fx:define>
         <FXBind controller="$controller"
@@ -40,6 +55,10 @@
         <FXBind controller="$controller"
                 controllerMethod="remainingBombs"
                 node="$remainingBombsField"
+                nodeMethod="text"/>
+        <FXBind controller="$controller"
+                controllerMethod="timer"
+                node="$timerField"
                 nodeMethod="text"/>
     </fx:define>
 </VBox>

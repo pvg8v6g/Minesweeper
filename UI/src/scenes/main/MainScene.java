@@ -28,8 +28,8 @@ public class MainScene extends Controller {
     // region Actions
 
     @FXML
-    private void easyAction() {
-
+    private void easyAction() throws IOException {
+        WindowManager.changeScene(Scenes.Scene.Game, new GameModel(8, 8, 10));
     }
 
     @FXML
@@ -38,8 +38,8 @@ public class MainScene extends Controller {
     }
 
     @FXML
-    private void hardAction() {
-
+    private void hardAction() throws IOException {
+        WindowManager.changeScene(Scenes.Scene.Game, new GameModel(20, 20, 90));
     }
 
     // endregion

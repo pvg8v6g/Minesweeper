@@ -1,7 +1,8 @@
 package scenes.game;
 
-import mathematics.Mathematics;
+import enumerations.GridStatuses;
 import enumerations.Scenes;
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,8 +14,10 @@ import javafx.fxml.FXML;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import list.Enumerable;
+import mathematics.Mathematics;
 import models.GameModel;
 import models.SweepGrid;
+import models.TimerModel;
 import position.Position;
 import scenes.controller.Controller;
 import windowmanager.WindowManager;
@@ -35,6 +38,8 @@ public class GameScene extends Controller<GameModel> {
         sweepGrids = new SimpleListProperty<>(FXCollections.observableArrayList());
         gameOver = new SimpleStringProperty();
         remainingBombs = new SimpleStringProperty();
+        timer = new SimpleStringProperty();
+        timerModel = new TimerModel();
     }
 
     // endregion
@@ -43,8 +48,23 @@ public class GameScene extends Controller<GameModel> {
 
     public void start() {
         super.start();
+        installTimer();
         installFieldGrid();
         setRemainingBombs("Bombs: " + variable.bombs);
+    }
+
+    // endregion
+
+    // region Reset
+
+    private void reset() {
+        getSweepGrids().clear();
+        mines.clear();
+        installFieldGrid();
+        setRemainingBombs("Bombs: " + variable.bombs);
+        setGameOver("");
+        timerModel.resetTimer();
+        firstClick = true;
     }
 
     // endregion
@@ -76,11 +96,11 @@ public class GameScene extends Controller<GameModel> {
     private void gridSelection(SweepGrid grid) {
         if (mines.any(mine -> mine.equals(new Position(grid.getColumn(), grid.getRow())))) {
             // game over
-            grid.boom();
+            timerModel.stopTimer();
             for (var sweepGrid : getSweepGrids()) {
+                sweepGrid.setMouseTransparent(true);
                 if (!isMine(sweepGrid)) continue;
-                if (sweepGrid.selected) continue;
-                sweepGrid.boom();
+                sweepGrid.setStatus(GridStatuses.GridStatus.Exploded);
             }
 
             setGameOver("Game Over");
@@ -98,9 +118,11 @@ public class GameScene extends Controller<GameModel> {
         }
 
         if (mineCount > 0) {
-            sweepGrid.select(mineCount);
+            sweepGrid.surroundingBombs = mineCount;
+            sweepGrid.setStatus(GridStatuses.GridStatus.Selected);
         } else {
-            sweepGrid.select(mineCount);
+            sweepGrid.surroundingBombs = mineCount;
+            sweepGrid.setStatus(GridStatuses.GridStatus.Selected);
             checks.forEach(this::findBombs);
         }
 
@@ -129,7 +151,7 @@ public class GameScene extends Controller<GameModel> {
 
     private SweepGrid getGrid(int x, int y) {
         var stream = getSweepGrids().stream()
-                .filter(sweepGrid -> !sweepGrid.selected)
+                .filter(sweepGrid -> sweepGrid.getStatus() != GridStatuses.GridStatus.Selected)
                 .filter(sweepGrid -> sweepGrid.getColumn() == x && sweepGrid.getRow() == y);
         var optional = stream.findFirst();
 
@@ -145,7 +167,7 @@ public class GameScene extends Controller<GameModel> {
 
         for (var sweepGrid : list) {
             if (!isMine(sweepGrid)) continue;
-            sweepGrid.debug();
+            sweepGrid.setStatus(GridStatuses.GridStatus.Debug);
         }
     }
 
@@ -153,35 +175,49 @@ public class GameScene extends Controller<GameModel> {
 
     // region Listeners
 
+    private void installTimer() {
+        setTimer("00:00");
+        timerModel.timerProperty().addListener((ov, o, n) -> {
+            var min = timerModel.getMinutes() < 10 ? "0" + timerModel.getMinutes() : "" + timerModel.getMinutes();
+            var sec = timerModel.getSeconds() < 10 ? "0" + timerModel.getSeconds() : "" + timerModel.getSeconds();
+            setTimer(min + ":" + sec);
+        });
+
+        Platform.runLater(() -> root.getScene().getWindow().focusedProperty().addListener((ov, o, n) -> {
+            if (firstClick) return;
+            if (n) timerModel.startTimer();
+            else timerModel.stopTimer();
+        }));
+    }
+
     private EventHandler<MouseEvent> gridEventHandler(int x, int y) {
         return mouseEvent -> {
             var grid = (SweepGrid) (mouseEvent.getSource());
             if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                switch (grid.state) {
-                    case -1 -> {
-                        grid.flag();
-                    }
-                    case 0 -> {
-                        grid.question();
-                    }
-                    case 1 -> grid.returnState();
+                switch (grid.getStatus()) {
+                    case Normal -> grid.setStatus(GridStatuses.GridStatus.Flagged);
+                    case Flagged -> grid.setStatus(GridStatuses.GridStatus.Questioned);
+                    case Questioned -> grid.setStatus(GridStatuses.GridStatus.Normal);
                 }
 
-                var bombs = variable.bombs - getSweepGrids().stream().filter(g -> g.state == 0).count();
+                var bombs = variable.bombs - getSweepGrids().stream().filter(g -> g.getStatus() == GridStatuses.GridStatus.Flagged).count();
                 setRemainingBombs("Bombs: " + bombs);
             } else {
-                if (grid.selected || grid.state > -1) return;
+                if (grid.getStatus() != GridStatuses.GridStatus.Normal) return;
                 if (firstClick) {
                     setUpMineField(x, y);
                     firstClick = false;
                     gridSelection(grid);
-                    debugMines();
+                    timerModel.startTimer();
+//                    debugMines();
                 } else {
                     gridSelection(grid);
                 }
 
                 if (checkVictoryCondition()) {
+                    timerModel.stopTimer();
                     setGameOver("YOU WIN!!");
+                    getSweepGrids().forEach(g -> g.setMouseTransparent(true));
                 }
             }
         };
@@ -189,7 +225,7 @@ public class GameScene extends Controller<GameModel> {
 
     private boolean checkVictoryCondition() {
         var list = new Enumerable<>(getSweepGrids());
-        return list.where(x -> !isMine(x)).where(x -> x.selected).size() >= (list.size() - variable.bombs);
+        return list.where(x -> !isMine(x)).where(x -> x.getStatus() == GridStatuses.GridStatus.Selected).size() >= (list.size() - variable.bombs);
     }
 
     // endregion
@@ -199,6 +235,11 @@ public class GameScene extends Controller<GameModel> {
     @FXML
     private void exitAction() throws IOException {
         WindowManager.changeScene(Scenes.Scene.Main, null);
+    }
+
+    @FXML
+    private void resetAction() throws IOException {
+        reset();
     }
 
     // endregion
@@ -242,9 +283,22 @@ public class GameScene extends Controller<GameModel> {
         this.remainingBombs.set(remainingBombs);
     }
 
+    public String getTimer() {
+        return timer.get();
+    }
+
+    public StringProperty timerProperty() {
+        return timer;
+    }
+
+    public void setTimer(String timer) {
+        this.timer.set(timer);
+    }
+
     private final ListProperty<SweepGrid> sweepGrids;
     private final StringProperty gameOver;
     private final StringProperty remainingBombs;
+    private final StringProperty timer;
 
     // endregion
 
@@ -252,6 +306,7 @@ public class GameScene extends Controller<GameModel> {
 
     private boolean firstClick = true;
     private final Enumerable<Position> mines = new Enumerable<>();
+    private final TimerModel timerModel;
 
     // endregion
 

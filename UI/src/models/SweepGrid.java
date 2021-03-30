@@ -1,12 +1,16 @@
 package models;
 
+import enumerations.GridStatuses;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 import java.net.URL;
 
@@ -23,6 +27,7 @@ public class SweepGrid extends StackPane {
     public SweepGrid(int column, int row) {
         this.column = new SimpleIntegerProperty();
         this.row = new SimpleIntegerProperty();
+        this.status = new SimpleObjectProperty<>();
         label = new Label();
         label.setMouseTransparent(true);
         location = SweepGrid.class.getClassLoader().getResource("images/");
@@ -38,45 +43,46 @@ public class SweepGrid extends StackPane {
         installListeners();
         setColumn(column);
         setRow(row);
+        setStatus(GridStatuses.GridStatus.Normal);
     }
 
     // endregion
 
-    // region
+    // region Statuses
 
-    public void debug() {
-        graphic.getStyleClass().setAll("selected-sweep-grid");
-        image("mine");
-    }
-
-    public void boom() {
-        selected = true;
-        graphic.getStyleClass().setAll("selected-sweep-grid");
-        image("mine");
-    }
-
-    public void select(int bombs) {
-        selected = true;
-        graphic.getStyleClass().setAll("selected-sweep-grid");
-        if (bombs > 0) label.setText(String.valueOf(bombs));
-    }
-
-    public void flag() {
-        state = 0;
-        image("flag");
-    }
-
-    public void question() {
-        state = 1;
-        label.setText("?");
-        imageView.setImage(null);
-    }
-
-    public void returnState() {
-        state = -1;
-        label.setText("");
-        imageView.setImage(null);
-    }
+//    public void debug() {
+//        graphic.getStyleClass().setAll("selected-sweep-grid");
+//        image("mine");
+//    }
+//
+//    public void boom() {
+//        status = GridStatuses.GridStatus.Exploded;
+//        graphic.getStyleClass().setAll("selected-sweep-grid");
+//        image("mine");
+//    }
+//
+//    public void select(int bombs) {
+//        status = GridStatuses.GridStatus.Selected;
+//        graphic.getStyleClass().setAll("selected-sweep-grid");
+//        if (bombs > 0) label.setText(String.valueOf(bombs));
+//    }
+//
+//    public void flag() {
+//        status = GridStatuses.GridStatus.Flagged;
+//        image("flag");
+//    }
+//
+//    public void question() {
+//        status = GridStatuses.GridStatus.Questioned;
+//        label.setText("?");
+//        imageView.setImage(null);
+//    }
+//
+//    public void returnState() {
+//        status = GridStatuses.GridStatus.Normal;
+//        label.setText("");
+//        imageView.setImage(null);
+//    }
 
     private void image(String file) {
         imageView.setImage(new Image(location + file + ".png"));
@@ -89,12 +95,72 @@ public class SweepGrid extends StackPane {
     // region Listener
 
     private void installListeners() {
-        columnProperty().addListener((ov, o, n) -> {
-            GridPane.setColumnIndex(this, n.intValue());
+        columnProperty().addListener((ov, o, n) -> GridPane.setColumnIndex(this, n.intValue()));
+
+        rowProperty().addListener((ov, o, n) -> GridPane.setRowIndex(this, n.intValue()));
+
+        statusProperty().addListener((ov, o, n) -> {
+            switch (n) {
+                case Normal -> {
+                    label.setText("");
+                    imageView.setImage(null);
+                    graphic.getStyleClass().setAll("sweep-grid");
+                }
+                case Selected -> {
+                    graphic.getStyleClass().setAll("selected-sweep-grid");
+                    if (surroundingBombs > 0) {
+                        label.setText(String.valueOf(surroundingBombs));
+                        label.setStyle("-fx-text-fill: " + getBombColor(surroundingBombs) + ";");
+                    } else label.setText("");
+                }
+                case Flagged -> {
+                    image("flag");
+                    graphic.getStyleClass().setAll("sweep-grid");
+                }
+                case Questioned -> {
+                    label.setText("?");
+                    imageView.setImage(null);
+                    graphic.getStyleClass().setAll("sweep-grid");
+                }
+                case Exploded, Debug -> {
+                    graphic.getStyleClass().setAll("selected-sweep-grid");
+                    image("mine");
+                }
+            }
         });
-        rowProperty().addListener((ov, o, n) -> {
-            GridPane.setRowIndex(this, n.intValue());
-        });
+    }
+
+    // endregion
+
+    // region Methods
+
+    private String getBombColor(int bombCount) {
+        switch (bombCount) {
+            case 2 -> {
+                return "#FFBA67";
+            }
+            case 3 -> {
+                return "#C1750D";
+            }
+            case 4 -> {
+                return "#C94000";
+            }
+            case 5 -> {
+                return "#FF0000";
+            }
+            case 6 -> {
+                return "#FF0048";
+            }
+            case 7 -> {
+                return "#AA0014";
+            }
+            case 8 -> {
+                return "#000000";
+            }
+            default -> {
+                return "#FFFFFF";
+            }
+        }
     }
 
     // endregion
@@ -125,8 +191,21 @@ public class SweepGrid extends StackPane {
         this.row.set(row);
     }
 
-    public final IntegerProperty column;
-    public final IntegerProperty row;
+    public GridStatuses.GridStatus getStatus() {
+        return status.get();
+    }
+
+    public ObjectProperty<GridStatuses.GridStatus> statusProperty() {
+        return status;
+    }
+
+    public void setStatus(GridStatuses.GridStatus status) {
+        this.status.set(status);
+    }
+
+    private final IntegerProperty column;
+    private final IntegerProperty row;
+    private final ObjectProperty<GridStatuses.GridStatus> status;
 
     // endregion
 
@@ -134,10 +213,9 @@ public class SweepGrid extends StackPane {
 
     private final Label label;
     private final StackPane graphic;
-    public boolean selected;
-    public int state = -1;
     public ImageView imageView;
     public URL location;
+    public int surroundingBombs;
 
     // endregion
 
