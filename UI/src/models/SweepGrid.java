@@ -129,6 +129,10 @@ public class SweepGrid extends StackPane {
         }
     }
 
+    public void hitMine() {
+        graphic.getStyleClass().setAll("exploded-sweep-grid");
+    }
+
     // endregion
 
     // region Properties

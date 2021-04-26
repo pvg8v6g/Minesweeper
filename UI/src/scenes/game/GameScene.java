@@ -99,10 +99,11 @@ public class GameScene extends Controller<GameModel> {
             timerModel.stopTimer();
             for (var sweepGrid : getSweepGrids()) {
                 sweepGrid.setMouseTransparent(true);
-                if (!isMine(sweepGrid)) continue;
+                if (!isMine(sweepGrid) || sweepGrid.getStatus() == GridStatuses.GridStatus.Flagged) continue;
                 sweepGrid.setStatus(GridStatuses.GridStatus.Exploded);
             }
 
+            grid.hitMine();
             setGameOver("Game Over");
         } else {
             findBombs(grid);

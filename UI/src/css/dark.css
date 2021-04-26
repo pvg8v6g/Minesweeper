@@ -61,3 +61,8 @@
     -fx-background-color: -fx-selected-background;
     -fx-background-radius: 3px;
 }
+
+.exploded-sweep-grid {
+    -fx-background-color: #8d1515;
+    -fx-background-radius: 3px;
+}
