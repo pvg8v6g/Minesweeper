@@ -9,6 +9,7 @@ module UI {
     requires javafx.controls;
     requires javafx.fxml;
     requires Core;
+    requires Data;
     exports main;
     exports windowmanager;
     exports scenes.main;

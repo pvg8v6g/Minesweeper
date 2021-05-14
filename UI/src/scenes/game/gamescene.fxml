@@ -25,7 +25,7 @@
             <HBox spacing="5.0">
                 <Label text="Time:"/>
                 <Label fx:id="timerField"
-                       minWidth="50.0"
+                       minWidth="80.0"
                        maxWidth="50.0"/>
             </HBox>
         </HBox>

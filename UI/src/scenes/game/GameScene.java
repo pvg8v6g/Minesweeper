@@ -1,5 +1,6 @@
 package scenes.game;
 
+import access.Access;
 import enumerations.GridStatuses;
 import enumerations.Scenes;
 import javafx.application.Platform;
@@ -96,6 +97,8 @@ public class GameScene extends Controller<GameModel> {
     private void gridSelection(SweepGrid grid) {
         if (mines.any(mine -> mine.equals(new Position(grid.getColumn(), grid.getRow())))) {
             // game over
+            Access.gameData.gamesFinished += 1;
+            Access.gameData.totalTimePlayed += timerModel.getTotalTime();
             timerModel.stopTimer();
             for (var sweepGrid : getSweepGrids()) {
                 sweepGrid.setMouseTransparent(true);
@@ -177,13 +180,10 @@ public class GameScene extends Controller<GameModel> {
     // region Listeners
 
     private void installTimer() {
-        setTimer("00:00");
-        timerModel.timerProperty().addListener((ov, o, n) -> {
-            var min = timerModel.getMinutes() < 10 ? "0" + timerModel.getMinutes() : "" + timerModel.getMinutes();
-            var sec = timerModel.getSeconds() < 10 ? "0" + timerModel.getSeconds() : "" + timerModel.getSeconds();
-            setTimer(min + ":" + sec);
+        setTimer("00 : 00 : 00");
+        timerModel.timeDisplayProperty().addListener((ov, o, n) -> {
+            setTimer(n);
         });
-
         Platform.runLater(() -> root.getScene().getWindow().focusedProperty().addListener((ov, o, n) -> {
             if (firstClick) return;
             if (n) timerModel.startTimer();
@@ -217,6 +217,9 @@ public class GameScene extends Controller<GameModel> {
 
                 if (checkVictoryCondition()) {
                     timerModel.stopTimer();
+                    Access.gameData.gamesFinished += 1;
+                    Access.gameData.gamesWon += 1;
+                    Access.gameData.totalTimePlayed += timerModel.getTotalTime();
                     setGameOver("YOU WIN!!");
                     getSweepGrids().forEach(g -> g.setMouseTransparent(true));
                 }

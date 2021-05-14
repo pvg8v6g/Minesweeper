@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
+<?import mvvm.FXBind?>
 <VBox fx:id="root"
       xmlns="https://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
@@ -12,6 +13,10 @@
       alignment="CENTER">
     <VBox spacing="40.0"
           alignment="CENTER">
+        <VBox alignment="CENTER">
+            <Label fx:id="averageTimeLabel"
+                   styleClass="title-label"/>
+        </VBox>
         <VBox spacing="5.0"
               alignment="CENTER">
             <Label styleClass="title-label"
@@ -36,4 +41,11 @@
 
         </VBox>
     </VBox>
+
+    <fx:define>
+        <FXBind controller="$controller"
+                controllerMethod="averageTime"
+                node="$averageTimeLabel"
+                nodeMethod="text"/>
+    </fx:define>
 </VBox>

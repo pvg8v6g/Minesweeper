@@ -1,5 +1,7 @@
 package windowmanager;
 
+import access.Access;
+import encryption.Encryption;
 import enumerations.Scenes;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -14,6 +16,9 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import scenes.controller.Controller;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +33,8 @@ public class WindowManager {
 
     // region Initialization
 
-    public static void initialize() throws IOException {
+    public static void initialize() throws IOException, InterruptedException {
+        Access.buildDataAccess();
         installVariables();
         createRoot();
         createScene();
@@ -64,6 +70,14 @@ public class WindowManager {
         stage.setMaximized(true);
         stage.titleProperty().bind(titleProperty());
         setTitle("Minesweeper");
+        stage.setOnCloseRequest(windowEvent -> {
+            try {
+                var t = Access.gameData;
+                Encryption.encryptData(Access.gameData, new FileOutputStream(new File(Access.gameFolder + "Data\\GameData.data")));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
         stage.show();
     }
 
