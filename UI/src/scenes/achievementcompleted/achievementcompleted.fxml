@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import mvvm.FXBind?>
+<VBox fx:id="root"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="scenes.achievementcompleted.AchievementCompleted"
+      alignment="CENTER"
+      styleClass="achievement-popup">
+    <HBox alignment="CENTER_LEFT"
+          spacing="15.0">
+        <ImageView fx:id="trophyImageView"
+                   fitWidth="30.0"
+                   fitHeight="30.0"/>
+        <HBox spacing="10.0"
+              alignment="CENTER_LEFT">
+            <Label fx:id="achievementNameLabel"/>
+            <Label text="Just Completed!!"/>
+        </HBox>
+    </HBox>
+    <fx:define>
+        <FXBind controller="$controller"
+                controllerMethod="achievementName"
+                node="$achievementNameLabel"
+                nodeMethod="text"/>
+        <FXBind controller="$controller"
+                controllerMethod="trophyImage"
+                node="$trophyImageView"
+                nodeMethod="image"/>
+    </fx:define>
+</VBox>

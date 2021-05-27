@@ -11,7 +11,9 @@ public class Scenes {
     public enum Scene {
 
         Main,
-        Game;
+        Game,
+        Achievements,
+        CompleteAchievement;
 
         // region Properites
 
@@ -43,6 +45,10 @@ public class Scenes {
             Main.setTitle("Minesweeper");
             Game.setFxml("game\\gamescene");
             Game.setTitle("Game");
+            Achievements.setFxml("achievements\\achievementsscene");
+            Achievements.setTitle("Achievements");
+            CompleteAchievement.setFxml("achievementcompleted\\achievementcompleted");
+            CompleteAchievement.setTitle("Completed Achievement");
         }
 
         // endregion

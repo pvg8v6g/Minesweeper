@@ -14,12 +14,16 @@ module UI {
     exports windowmanager;
     exports scenes.main;
     exports scenes.game;
+    exports scenes.achievements;
+    exports scenes.achievementcompleted;
     exports scenes.controller;
     exports models;
     opens main;
     opens windowmanager;
     opens scenes.main;
     opens scenes.game;
+    opens scenes.achievements;
+    opens scenes.achievementcompleted;
     opens scenes.controller;
     opens models;
 }

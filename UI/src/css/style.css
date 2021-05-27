@@ -14,3 +14,11 @@
 .title-label {
     -fx-font-size: 26px;
 }
+
+.avg-time-label {
+    -fx-font-size: 18px;
+}
+
+.tooltip-pop {
+    -fx-font-size: 20px;
+}

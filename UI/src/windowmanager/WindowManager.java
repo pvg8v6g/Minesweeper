@@ -3,6 +3,10 @@ package windowmanager;
 import access.Access;
 import encryption.Encryption;
 import enumerations.Scenes;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,8 +16,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import javafx.util.Pair;
+import list.Enumerable;
 import scenes.controller.Controller;
 
 import java.io.File;
@@ -61,7 +70,7 @@ public class WindowManager {
 
     private static void createScene() throws IOException {
         scene = new Scene(root);
-        loadTheme("dark.css");
+        loadTheme(scene, "dark.css");
         changeScene(Scenes.Scene.Main, null);
     }
 
@@ -85,7 +94,7 @@ public class WindowManager {
 
     // region Stylesheet Loading
 
-    public static void loadTheme(String stylesheet) {
+    public static void loadTheme(Scene scene, String stylesheet) {
         var defaultStyle = css + "style.css";
         var theme = css + stylesheet;
         scene.getStylesheets().setAll(defaultStyle, theme);
@@ -113,13 +122,97 @@ public class WindowManager {
     // region Scenes
 
     public static <T> void changeScene(Scenes.Scene newScene, T variable) throws IOException {
-        Pair<Parent, Controller<T>> pair = getControllerParent(newScene);
+        var pair = initializeController(newScene, variable);
         if (pair == null) return;
+        root.getChildren().setAll(pair.getKey());
+    }
+
+    public static <T> Stage showPopup(Stage owner, Scenes.Scene newScene, T variable, StageStyle stageStyle) throws IOException {
+        var pair = initializeController(newScene, variable);
+        if (pair == null) return null;
+        var popup = new Stage();
+        popup.initOwner(owner);
+        popup.initStyle(stageStyle);
+        popup.initModality(Modality.NONE);
+        popup.setAlwaysOnTop(true);
+        var popupScene = new Scene(pair.getKey());
+        if (stageStyle == StageStyle.TRANSPARENT) popupScene.setFill(Color.TRANSPARENT);
+        loadTheme(popupScene, "dark.css");
+        popup.setTitle(newScene.getTitle());
+        popup.setScene(popupScene);
+        return popup;
+    }
+
+    public static <T> Stage showPopup(Stage owner, Scenes.Scene newScene, T variable, StageStyle stageStyle, double x, double y, double width, double height) throws IOException {
+        var pair = initializeController(newScene, variable);
+        if (pair == null) return null;
+        var popup = new Stage();
+        popup.initOwner(owner);
+        popup.initStyle(stageStyle);
+        popup.initModality(Modality.NONE);
+        popup.setAlwaysOnTop(true);
+        popup.setX(x);
+        popup.setY(y);
+        var popupScene = new Scene(pair.getKey(), width, height);
+        if (stageStyle == StageStyle.TRANSPARENT) popupScene.setFill(Color.TRANSPARENT);
+        loadTheme(popupScene, "dark.css");
+        popup.setTitle(newScene.getTitle());
+        popup.setScene(popupScene);
+        return popup;
+    }
+
+    // endregion
+
+    // region Methods
+
+    public static void checkAchievements() throws IOException {
+        var achievementsToCheck = Access.gameData.achievements.where(x -> !x.completed);
+        var timelines = new Enumerable<SequentialTransition>();
+        for (var achievement : achievementsToCheck) {
+            if (!achievement.checkCompletion()) continue;
+            var popup = WindowManager.showPopup(stage,
+                    Scenes.Scene.CompleteAchievement,
+                    achievement,
+                    StageStyle.TRANSPARENT,
+                    stage.getX() + 15.0,
+                    stage.getY() + 50.0,
+                    275.0,
+                    40.0);
+            if (popup == null) continue;
+
+            var timeline1 = new Timeline();
+            timeline1.setCycleCount(1);
+            var kf1 = new KeyFrame(Duration.millis(1), t -> {
+                popup.show();
+                stage.requestFocus();
+            });
+            timeline1.getKeyFrames().add(kf1);
+
+            var timeline2 = new Timeline();
+            var kf2 = new KeyFrame(Duration.millis(2001));
+            timeline2.getKeyFrames().add(kf2);
+
+            var timeline3 = new Timeline();
+            var kv1 = new KeyValue(popup.opacityProperty(), 0.0);
+            var kf3 = new KeyFrame(Duration.millis(2500), t -> popup.hide(), kv1);
+            timeline3.getKeyFrames().add(kf3);
+
+            timelines.add(new SequentialTransition(timeline1, timeline2, timeline3));
+        }
+
+        var st = new SequentialTransition();
+        st.getChildren().setAll(timelines);
+        st.play();
+    }
+
+    private static <T> Pair<Parent, Controller<T>> initializeController(Scenes.Scene newScene, T variable) throws IOException {
+        Pair<Parent, Controller<T>> pair = getControllerParent(newScene);
+        if (pair == null) return null;
         pair.getValue().variable = variable;
         pair.getValue().start();
         setActiveController(pair.getValue());
         setTitle(newScene.getTitle());
-        root.getChildren().setAll(pair.getKey());
+        return pair;
     }
 
     // endregion

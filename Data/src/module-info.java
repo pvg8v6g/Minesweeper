@@ -9,7 +9,9 @@ module Data {
     exports access;
     exports data;
     exports encryption;
+    exports achievement;
     opens access;
     opens data;
     opens encryption;
+    opens achievement;
 }

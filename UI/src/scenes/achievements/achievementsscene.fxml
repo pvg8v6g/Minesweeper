@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<VBox fx:id="root"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="scenes.achievements.AchievementsScene"
+      styleClass="theme-back"
+      spacing="15.0">
+    <Button text="Return"
+            onAction="#returnAction"
+            prefWidth="150.0"
+            prefHeight="35.0"/>
+    <GridPane fx:id="gridPane"/>
+</VBox>

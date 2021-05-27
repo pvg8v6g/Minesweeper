@@ -99,6 +99,11 @@ public class GameScene extends Controller<GameModel> {
             // game over
             Access.gameData.gamesFinished += 1;
             Access.gameData.totalTimePlayed += timerModel.getTotalTime();
+            try {
+                WindowManager.checkAchievements();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             timerModel.stopTimer();
             for (var sweepGrid : getSweepGrids()) {
                 sweepGrid.setMouseTransparent(true);
@@ -202,6 +207,7 @@ public class GameScene extends Controller<GameModel> {
                 }
 
                 var bombs = variable.bombs - getSweepGrids().stream().filter(g -> g.getStatus() == GridStatuses.GridStatus.Flagged).count();
+                Access.gameData.bombsLeft = (int) bombs;
                 setRemainingBombs("Bombs: " + bombs);
             } else {
                 if (grid.getStatus() != GridStatuses.GridStatus.Normal) return;
@@ -210,6 +216,8 @@ public class GameScene extends Controller<GameModel> {
                     firstClick = false;
                     gridSelection(grid);
                     timerModel.startTimer();
+                    Access.gameData.gameJustEnded = false;
+                    Access.gameData.bombsLeft = variable.bombs - (int) getSweepGrids().stream().filter(g -> g.getStatus() == GridStatuses.GridStatus.Flagged).count();
 //                    debugMines();
                 } else {
                     gridSelection(grid);
@@ -220,6 +228,12 @@ public class GameScene extends Controller<GameModel> {
                     Access.gameData.gamesFinished += 1;
                     Access.gameData.gamesWon += 1;
                     Access.gameData.totalTimePlayed += timerModel.getTotalTime();
+                    Access.gameData.gameJustEnded = true;
+                    try {
+                        WindowManager.checkAchievements();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     setGameOver("YOU WIN!!");
                     getSweepGrids().forEach(g -> g.setMouseTransparent(true));
                 }

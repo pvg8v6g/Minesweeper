@@ -1,13 +1,16 @@
 package access;
 
+import achievement.AchievementKaboom;
+import achievement.AchievementRadar;
+import achievement.AchievementVictory;
 import data.GameData;
 import encryption.Encryption;
+import enumerations.Achievements;
 import list.Enumerable;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * This file has been created by:
@@ -20,14 +23,14 @@ public class Access {
 
     // region Initialize Data
 
-    public static void buildDataAccess() throws IOException, InterruptedException {
+    public static void buildDataAccess() {
         setUpDocumentsLocation();
         setUpGameFolder();
         createFolderStructure();
         createGameData();
     }
 
-    private static void setUpDocumentsLocation() throws IOException, InterruptedException {
+    private static void setUpDocumentsLocation() {
         var roaming = System.getenv("APPDATA");
         var size = roaming.length();
         documents = roaming.substring(0, (size - 1) - 14) + "Documents\\";
@@ -53,6 +56,14 @@ public class Access {
             gameData = (GameData) Encryption.decryptData(new FileInputStream(dataFile));
         } catch (FileNotFoundException e) {
             gameData = new GameData();
+            gameData.achievements = new Enumerable<>();
+            for (var value : Achievements.Achievement.values()) {
+                switch (value) {
+                    case Kaboom -> gameData.achievements.add(new AchievementKaboom());
+                    case Victory -> gameData.achievements.add(new AchievementVictory());
+                    case Radar -> gameData.achievements.add(new AchievementRadar());
+                }
+            }
         }
     }
 

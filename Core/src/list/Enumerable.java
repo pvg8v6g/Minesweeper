@@ -1,5 +1,6 @@
 package list;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
  * 1:58 PM
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach", "UnusedReturnValue", "SuspiciousSystemArraycopy", "unchecked"})
-public class Enumerable<T> implements Collection<T> {
+public class Enumerable<T> implements Collection<T>, Serializable {
 
     //region Constructors
 
@@ -493,6 +494,8 @@ public class Enumerable<T> implements Collection<T> {
     private Object[] data;
     private int dataSize;
     private int modifiedCount;
+
+    private static final long serialVersionUID = 88185441447785L;
 
     //endregion
 

@@ -66,3 +66,60 @@
     -fx-background-color: #8d1515;
     -fx-background-radius: 3px;
 }
+
+/*******************************************************************************
+ *                                                                             *
+ * Achievement Button                                                          *
+ *                                                                             *
+ ******************************************************************************/
+.achievement-pane {
+    -fx-background-color: #243d53;
+}
+
+.achievement-pane:hover {
+    -fx-background-color: #0274b3;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Achievement Model                                                           *
+ *                                                                             *
+ ******************************************************************************/
+.achievement-model {
+    -fx-background-color: #525252;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-width: 2px;
+    -fx-border-color: #000000;
+}
+
+.achievement-model:hover {
+    -fx-background-color: #262626;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Achievement Model Gold                                                      *
+ *                                                                             *
+ ******************************************************************************/
+.achievement-model-gold {
+    -fx-background-color: #525252;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffb700;
+}
+
+.achievement-model-gold:hover {
+    -fx-background-color: #262626;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Achievement Popup                                                           *
+ *                                                                             *
+ ******************************************************************************/
+.achievement-popup {
+    -fx-background-color: #2c9218;
+    -fx-background-radius: 5px;
+}
